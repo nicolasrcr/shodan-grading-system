@@ -14,7 +14,239 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      candidates: {
+        Row: {
+          accumulated_points: number | null
+          association: string | null
+          birth_date: string
+          created_at: string
+          current_grade: string
+          email: string | null
+          federation: string
+          full_name: string
+          id: string
+          registration_years: number | null
+          target_grade: string
+          updated_at: string
+          zempo_registration: string | null
+        }
+        Insert: {
+          accumulated_points?: number | null
+          association?: string | null
+          birth_date: string
+          created_at?: string
+          current_grade: string
+          email?: string | null
+          federation: string
+          full_name: string
+          id?: string
+          registration_years?: number | null
+          target_grade: string
+          updated_at?: string
+          zempo_registration?: string | null
+        }
+        Update: {
+          accumulated_points?: number | null
+          association?: string | null
+          birth_date?: string
+          created_at?: string
+          current_grade?: string
+          email?: string | null
+          federation?: string
+          full_name?: string
+          id?: string
+          registration_years?: number | null
+          target_grade?: string
+          updated_at?: string
+          zempo_registration?: string | null
+        }
+        Relationships: []
+      }
+      evaluations: {
+        Row: {
+          candidate_id: string
+          created_at: string
+          evaluation_date: string
+          evaluator_grade: string
+          evaluator_name: string
+          id: string
+          location: string | null
+          nota_final: number | null
+          nota_pratica_final: number | null
+          nota_teorica_final: number | null
+          observations: string | null
+          pratica_arbitragem: number | null
+          pratica_goshin_jutsu: number | null
+          pratica_ju_no_kata: number | null
+          pratica_kaeshi_waza: number | null
+          pratica_katame_no_kata: number | null
+          pratica_katame_waza: number | null
+          pratica_kime_no_kata: number | null
+          pratica_nage_no_kata: number | null
+          pratica_nage_waza: number | null
+          pratica_pedagogia: number | null
+          pratica_renraku_waza: number | null
+          status: string | null
+          target_grade: string
+          teoria_arbitragem: number | null
+          teoria_atualidades: number | null
+          teoria_etica: number | null
+          teoria_filosofia: number | null
+          teoria_historico: number | null
+          teoria_kata: number | null
+          teoria_tecnicas: number | null
+          teoria_vocabulario: number | null
+          updated_at: string
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string
+          evaluation_date?: string
+          evaluator_grade: string
+          evaluator_name: string
+          id?: string
+          location?: string | null
+          nota_final?: number | null
+          nota_pratica_final?: number | null
+          nota_teorica_final?: number | null
+          observations?: string | null
+          pratica_arbitragem?: number | null
+          pratica_goshin_jutsu?: number | null
+          pratica_ju_no_kata?: number | null
+          pratica_kaeshi_waza?: number | null
+          pratica_katame_no_kata?: number | null
+          pratica_katame_waza?: number | null
+          pratica_kime_no_kata?: number | null
+          pratica_nage_no_kata?: number | null
+          pratica_nage_waza?: number | null
+          pratica_pedagogia?: number | null
+          pratica_renraku_waza?: number | null
+          status?: string | null
+          target_grade: string
+          teoria_arbitragem?: number | null
+          teoria_atualidades?: number | null
+          teoria_etica?: number | null
+          teoria_filosofia?: number | null
+          teoria_historico?: number | null
+          teoria_kata?: number | null
+          teoria_tecnicas?: number | null
+          teoria_vocabulario?: number | null
+          updated_at?: string
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string
+          evaluation_date?: string
+          evaluator_grade?: string
+          evaluator_name?: string
+          id?: string
+          location?: string | null
+          nota_final?: number | null
+          nota_pratica_final?: number | null
+          nota_teorica_final?: number | null
+          observations?: string | null
+          pratica_arbitragem?: number | null
+          pratica_goshin_jutsu?: number | null
+          pratica_ju_no_kata?: number | null
+          pratica_kaeshi_waza?: number | null
+          pratica_katame_no_kata?: number | null
+          pratica_katame_waza?: number | null
+          pratica_kime_no_kata?: number | null
+          pratica_nage_no_kata?: number | null
+          pratica_nage_waza?: number | null
+          pratica_pedagogia?: number | null
+          pratica_renraku_waza?: number | null
+          status?: string | null
+          target_grade?: string
+          teoria_arbitragem?: number | null
+          teoria_atualidades?: number | null
+          teoria_etica?: number | null
+          teoria_filosofia?: number | null
+          teoria_historico?: number | null
+          teoria_kata?: number | null
+          teoria_tecnicas?: number | null
+          teoria_vocabulario?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluations_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grade_programs: {
+        Row: {
+          created_at: string
+          grade: string
+          id: string
+          minimum_age: number
+          minimum_carency_years: number
+          minimum_points: number
+          practical_requirements: Json | null
+          required_katas: Json | null
+          theoretical_topics: Json | null
+        }
+        Insert: {
+          created_at?: string
+          grade: string
+          id?: string
+          minimum_age: number
+          minimum_carency_years: number
+          minimum_points: number
+          practical_requirements?: Json | null
+          required_katas?: Json | null
+          theoretical_topics?: Json | null
+        }
+        Update: {
+          created_at?: string
+          grade?: string
+          id?: string
+          minimum_age?: number
+          minimum_carency_years?: number
+          minimum_points?: number
+          practical_requirements?: Json | null
+          required_katas?: Json | null
+          theoretical_topics?: Json | null
+        }
+        Relationships: []
+      }
+      theoretical_questions: {
+        Row: {
+          category: string
+          correct_answer: string | null
+          created_at: string
+          grade: string
+          id: string
+          options: Json | null
+          points: number | null
+          question: string
+        }
+        Insert: {
+          category: string
+          correct_answer?: string | null
+          created_at?: string
+          grade: string
+          id?: string
+          options?: Json | null
+          points?: number | null
+          question: string
+        }
+        Update: {
+          category?: string
+          correct_answer?: string | null
+          created_at?: string
+          grade?: string
+          id?: string
+          options?: Json | null
+          points?: number | null
+          question?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
