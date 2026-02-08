@@ -12,8 +12,10 @@ import {
   Plus,
   TrendingUp,
   Target,
-  Award
+  Award,
+  FileDown
 } from 'lucide-react';
+import { generateStatsReportPDF } from '@/utils/generateReportsPDF';
 import {
   BarChart,
   Bar,
@@ -226,13 +228,33 @@ export default function Dashboard() {
               Gerencie avaliações de graduação do 1º ao 5º DAN
             </p>
           </div>
-          <Button 
-            onClick={() => navigate('/new-evaluation')}
-            className="bg-accent hover:bg-accent/90"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Nova Avaliação
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => {
+                generateStatsReportPDF({
+                  ...stats,
+                  approvalRate: parseFloat(approvalRate),
+                  gradeStats: gradeStats.map(g => ({
+                    grade: g.grade,
+                    total: g.total,
+                    approved: g.approved,
+                    averageScore: g.averageScore,
+                  })),
+                });
+              }}
+            >
+              <FileDown className="h-4 w-4 mr-2" />
+              Exportar PDF
+            </Button>
+            <Button 
+              onClick={() => navigate('/new-evaluation')}
+              className="bg-accent hover:bg-accent/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nova Avaliação
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
