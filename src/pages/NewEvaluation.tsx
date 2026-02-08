@@ -1,0 +1,458 @@
+import { useState, useEffect } from 'react';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { GRADE_OPTIONS } from '@/types/evaluation';
+import { CheckCircle, XCircle, Save, Printer } from 'lucide-react';
+
+interface EvaluationFields {
+  // Teoria
+  teoria_historico: string;
+  teoria_filosofia: string;
+  teoria_etica: string;
+  teoria_atualidades: string;
+  teoria_tecnicas: string;
+  teoria_vocabulario: string;
+  teoria_kata: string;
+  teoria_arbitragem: string;
+  // Prática
+  pratica_nage_no_kata: string;
+  pratica_katame_no_kata: string;
+  pratica_ju_no_kata: string;
+  pratica_kime_no_kata: string;
+  pratica_goshin_jutsu: string;
+  pratica_nage_waza: string;
+  pratica_renraku_waza: string;
+  pratica_kaeshi_waza: string;
+  pratica_katame_waza: string;
+  pratica_arbitragem: string;
+  pratica_pedagogia: string;
+}
+
+const initialFields: EvaluationFields = {
+  teoria_historico: '',
+  teoria_filosofia: '',
+  teoria_etica: '',
+  teoria_atualidades: '',
+  teoria_tecnicas: '',
+  teoria_vocabulario: '',
+  teoria_kata: '',
+  teoria_arbitragem: '',
+  pratica_nage_no_kata: '',
+  pratica_katame_no_kata: '',
+  pratica_ju_no_kata: '',
+  pratica_kime_no_kata: '',
+  pratica_goshin_jutsu: '',
+  pratica_nage_waza: '',
+  pratica_renraku_waza: '',
+  pratica_kaeshi_waza: '',
+  pratica_katame_waza: '',
+  pratica_arbitragem: '',
+  pratica_pedagogia: '',
+};
+
+// Configuração dos campos por DAN
+const getFieldsByGrade = (grade: string) => {
+  const baseTeoria = ['teoria_historico', 'teoria_filosofia', 'teoria_etica', 'teoria_tecnicas', 'teoria_vocabulario'];
+  const basePratica = ['pratica_nage_waza', 'pratica_renraku_waza', 'pratica_kaeshi_waza', 'pratica_katame_waza'];
+  
+  switch (grade) {
+    case '1º DAN':
+      return {
+        teoria: [...baseTeoria, 'teoria_atualidades', 'teoria_kata'],
+        pratica: ['pratica_nage_no_kata', ...basePratica, 'pratica_arbitragem'],
+      };
+    case '2º DAN':
+      return {
+        teoria: [...baseTeoria, 'teoria_atualidades', 'teoria_kata', 'teoria_arbitragem'],
+        pratica: ['pratica_katame_no_kata', 'pratica_nage_no_kata', ...basePratica, 'pratica_pedagogia'],
+      };
+    case '3º DAN':
+      return {
+        teoria: [...baseTeoria, 'teoria_kata', 'teoria_arbitragem'],
+        pratica: ['pratica_ju_no_kata', 'pratica_katame_no_kata', 'pratica_pedagogia'],
+      };
+    case '4º DAN':
+      return {
+        teoria: [...baseTeoria, 'teoria_kata', 'teoria_arbitragem'],
+        pratica: ['pratica_kime_no_kata', 'pratica_ju_no_kata', 'pratica_pedagogia'],
+      };
+    case '5º DAN':
+      return {
+        teoria: [...baseTeoria, 'teoria_kata', 'teoria_arbitragem'],
+        pratica: ['pratica_goshin_jutsu', 'pratica_kime_no_kata', 'pratica_pedagogia'],
+      };
+    default:
+      return { teoria: baseTeoria, pratica: basePratica };
+  }
+};
+
+const fieldLabels: Record<string, string> = {
+  teoria_historico: 'Histórico',
+  teoria_filosofia: 'Filosofia',
+  teoria_etica: 'Ética e Disciplina',
+  teoria_atualidades: 'Atualidades',
+  teoria_tecnicas: 'Divisão e Classificação das Técnicas',
+  teoria_vocabulario: 'Ortografia do Vocabulário Técnico',
+  teoria_kata: 'Descrição Escrita sobre Kata',
+  teoria_arbitragem: 'Conhecimento de Arbitragem',
+  pratica_nage_no_kata: 'Nage no Kata',
+  pratica_katame_no_kata: 'Katame no Kata',
+  pratica_ju_no_kata: 'Ju no Kata',
+  pratica_kime_no_kata: 'Kime no Kata',
+  pratica_goshin_jutsu: 'Kodokan Goshin Jutsu',
+  pratica_nage_waza: 'Nage Waza',
+  pratica_renraku_waza: 'Renraku Waza / Henka Waza',
+  pratica_kaeshi_waza: 'Kaeshi Waza',
+  pratica_katame_waza: 'Katame Waza',
+  pratica_arbitragem: 'Apresentação Prática de Arbitragem',
+  pratica_pedagogia: 'Conhecimentos Didáticos e Pedagógicos',
+};
+
+interface Candidate {
+  id: string;
+  full_name: string;
+  target_grade: string;
+}
+
+export default function NewEvaluation() {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [selectedCandidate, setSelectedCandidate] = useState('');
+  const [selectedGrade, setSelectedGrade] = useState('1º DAN');
+  const [evaluatorName, setEvaluatorName] = useState('');
+  const [evaluatorGrade, setEvaluatorGrade] = useState('');
+  const [location, setLocation] = useState('');
+  const [evaluationDate, setEvaluationDate] = useState(new Date().toISOString().split('T')[0]);
+  const [observations, setObservations] = useState('');
+  const [fields, setFields] = useState<EvaluationFields>(initialFields);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchCandidates() {
+      const { data } = await supabase
+        .from('candidates')
+        .select('id, full_name, target_grade')
+        .order('full_name');
+      
+      if (data) {
+        setCandidates(data);
+      }
+    }
+    fetchCandidates();
+  }, []);
+
+  const handleFieldChange = (field: keyof EvaluationFields, value: string) => {
+    // Validar nota entre 0 e 10
+    const numValue = parseFloat(value);
+    if (value !== '' && (isNaN(numValue) || numValue < 0 || numValue > 10)) {
+      return;
+    }
+    setFields(prev => ({ ...prev, [field]: value }));
+  };
+
+  const calculateAverage = (fieldList: string[]): number => {
+    const values = fieldList
+      .map(f => parseFloat(fields[f as keyof EvaluationFields] || '0'))
+      .filter(v => !isNaN(v) && v > 0);
+    
+    if (values.length === 0) return 0;
+    return values.reduce((a, b) => a + b, 0) / values.length;
+  };
+
+  const gradeFields = getFieldsByGrade(selectedGrade);
+  const notaTeorica = calculateAverage(gradeFields.teoria);
+  const notaPratica = calculateAverage(gradeFields.pratica);
+  const notaFinal = (notaTeorica + notaPratica) / 2;
+
+  const handleSubmit = async (status: 'pendente' | 'aprovado' | 'reprovado') => {
+    if (!selectedCandidate) {
+      toast({
+        title: 'Erro',
+        description: 'Selecione um candidato.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!evaluatorName || !evaluatorGrade) {
+      toast({
+        title: 'Erro',
+        description: 'Preencha os dados do avaliador.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    const evaluationData: Record<string, unknown> = {
+      candidate_id: selectedCandidate,
+      target_grade: selectedGrade,
+      evaluator_name: evaluatorName,
+      evaluator_grade: evaluatorGrade,
+      location: location || null,
+      evaluation_date: evaluationDate,
+      observations: observations || null,
+      nota_teorica_final: notaTeorica,
+      nota_pratica_final: notaPratica,
+      nota_final: notaFinal,
+      status,
+    };
+
+    // Adicionar notas dos campos
+    Object.entries(fields).forEach(([key, value]) => {
+      if (value !== '') {
+        evaluationData[key] = parseFloat(value);
+      }
+    });
+
+    const { error } = await supabase.from('evaluations').insert([evaluationData as any]);
+
+    if (error) {
+      toast({
+        title: 'Erro ao salvar',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: 'Avaliação salva!',
+        description: `Candidato ${status === 'aprovado' ? 'aprovado' : status === 'reprovado' ? 'reprovado' : 'avaliação pendente'}.`,
+      });
+      navigate('/evaluations');
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <MainLayout>
+      <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
+        {/* Cabeçalho da Súmula */}
+        <Card className="overflow-hidden">
+          <div className="sumula-header">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-display font-bold">
+                  Súmula de Avaliação
+                </h1>
+                <p className="text-sm opacity-80 mt-1">
+                  Exame de Graduação - Regulamento CBJ
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="secondary" size="sm" onClick={() => window.print()}>
+                  <Printer className="h-4 w-4 mr-2" />
+                  Imprimir
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <CardContent className="p-6">
+            {/* Dados Gerais */}
+            <div className="sumula-section">
+              <h3 className="font-display font-semibold text-lg mb-4">Dados da Avaliação</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Label>Candidato</Label>
+                  <Select value={selectedCandidate} onValueChange={setSelectedCandidate}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o candidato" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {candidates.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.full_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label>Graduação Pretendida</Label>
+                  <Select value={selectedGrade} onValueChange={setSelectedGrade}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GRADE_OPTIONS.slice(0, 5).map((g) => (
+                        <SelectItem key={g.value} value={g.value}>
+                          {g.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label>Data da Avaliação</Label>
+                  <Input 
+                    type="date" 
+                    value={evaluationDate}
+                    onChange={(e) => setEvaluationDate(e.target.value)}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Nome do Avaliador</Label>
+                  <Input 
+                    value={evaluatorName}
+                    onChange={(e) => setEvaluatorName(e.target.value)}
+                    placeholder="Nome completo"
+                  />
+                </div>
+                
+                <div>
+                  <Label>Graduação do Avaliador</Label>
+                  <Select value={evaluatorGrade} onValueChange={setEvaluatorGrade}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GRADE_OPTIONS.map((g) => (
+                        <SelectItem key={g.value} value={g.value}>
+                          {g.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label>Local</Label>
+                  <Input 
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Local do exame"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Prova Teórica */}
+            <div className="sumula-section">
+              <h3 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 bg-accent rounded-full"></span>
+                Prova Teórica
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {gradeFields.teoria.map((field) => (
+                  <div key={field} className="space-y-2">
+                    <Label className="text-sm">{fieldLabels[field]}</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.5"
+                      value={fields[field as keyof EvaluationFields]}
+                      onChange={(e) => handleFieldChange(field as keyof EvaluationFields, e.target.value)}
+                      className="score-input w-full"
+                      placeholder="0-10"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 bg-secondary rounded-lg flex items-center justify-between">
+                <span className="font-medium">Média Teórica:</span>
+                <span className="text-xl font-bold">{notaTeorica.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Prova Prática */}
+            <div className="sumula-section">
+              <h3 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 bg-success rounded-full"></span>
+                Prova Prática
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {gradeFields.pratica.map((field) => (
+                  <div key={field} className="space-y-2">
+                    <Label className="text-sm">{fieldLabels[field]}</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.5"
+                      value={fields[field as keyof EvaluationFields]}
+                      onChange={(e) => handleFieldChange(field as keyof EvaluationFields, e.target.value)}
+                      className="score-input w-full"
+                      placeholder="0-10"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 bg-secondary rounded-lg flex items-center justify-between">
+                <span className="font-medium">Média Prática:</span>
+                <span className="text-xl font-bold">{notaPratica.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Resultado Final */}
+            <div className="sumula-section">
+              <h3 className="font-display font-semibold text-lg mb-4">Resultado</h3>
+              <div className="p-4 bg-primary text-primary-foreground rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-medium">Nota Final:</span>
+                  <span className="text-3xl font-bold">{notaFinal.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Observações */}
+            <div className="sumula-section border-b-0 pb-0 mb-0">
+              <h3 className="font-display font-semibold text-lg mb-4">Observações</h3>
+              <Textarea
+                value={observations}
+                onChange={(e) => setObservations(e.target.value)}
+                placeholder="Observações sobre a avaliação..."
+                rows={4}
+              />
+            </div>
+          </CardContent>
+
+          {/* Ações */}
+          <div className="border-t p-6 bg-secondary/50 flex flex-col sm:flex-row gap-3 justify-end">
+            <Button 
+              variant="outline"
+              onClick={() => handleSubmit('pendente')}
+              disabled={loading}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Salvar Rascunho
+            </Button>
+            <Button 
+              variant="destructive"
+              onClick={() => handleSubmit('reprovado')}
+              disabled={loading}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Reprovar
+            </Button>
+            <Button 
+              className="bg-success hover:bg-success/90"
+              onClick={() => handleSubmit('aprovado')}
+              disabled={loading}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Aprovar
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </MainLayout>
+  );
+}
