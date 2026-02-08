@@ -11,7 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { GRADE_OPTIONS } from '@/types/evaluation';
-import { CheckCircle, XCircle, Save, Printer } from 'lucide-react';
+import { CheckCircle, XCircle, Save, FileDown } from 'lucide-react';
+import { generateEvaluationPDF } from '@/utils/generateEvaluationPDF';
 
 interface EvaluationFields {
   // Teoria
@@ -176,6 +177,40 @@ export default function NewEvaluation() {
   const notaPratica = calculateAverage(gradeFields.pratica);
   const notaFinal = (notaTeorica + notaPratica) / 2;
 
+  const handleGeneratePDF = () => {
+    const candidateName = candidates.find(c => c.id === selectedCandidate)?.full_name || 'Candidato';
+    
+    const teoriaScores = gradeFields.teoria.map(field => ({
+      label: fieldLabels[field],
+      score: fields[field as keyof EvaluationFields],
+    }));
+    
+    const praticaScores = gradeFields.pratica.map(field => ({
+      label: fieldLabels[field],
+      score: fields[field as keyof EvaluationFields],
+    }));
+
+    generateEvaluationPDF({
+      candidateName,
+      targetGrade: selectedGrade,
+      evaluatorName,
+      evaluatorGrade,
+      evaluationDate,
+      location,
+      observations,
+      teoriaScores,
+      praticaScores,
+      notaTeorica,
+      notaPratica,
+      notaFinal,
+    });
+
+    toast({
+      title: 'PDF Gerado!',
+      description: 'O arquivo foi baixado automaticamente.',
+    });
+  };
+
   const handleSubmit = async (status: 'pendente' | 'aprovado' | 'reprovado') => {
     if (!selectedCandidate) {
       toast({
@@ -253,9 +288,9 @@ export default function NewEvaluation() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button variant="secondary" size="sm" onClick={() => window.print()}>
-                  <Printer className="h-4 w-4 mr-2" />
-                  Imprimir
+                <Button variant="secondary" size="sm" onClick={handleGeneratePDF}>
+                  <FileDown className="h-4 w-4 mr-2" />
+                  Gerar PDF
                 </Button>
               </div>
             </div>
