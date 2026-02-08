@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { GRADE_OPTIONS, PREVIOUS_GRADES, type Candidate } from '@/types/evaluation';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, FileDown } from 'lucide-react';
+import { generateCandidatesReportPDF } from '@/utils/generateReportsPDF';
 
 export default function CandidatesPage() {
   const { toast } = useToast();
@@ -106,6 +107,14 @@ export default function CandidatesPage() {
     c.federation.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleExportPDF = () => {
+    generateCandidatesReportPDF(filteredCandidates);
+    toast({
+      title: 'PDF Gerado!',
+      description: 'Relatório de candidatos exportado com sucesso.',
+    });
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-fade-in">
@@ -120,13 +129,19 @@ export default function CandidatesPage() {
             </p>
           </div>
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-accent hover:bg-accent/90">
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Candidato
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportPDF} disabled={filteredCandidates.length === 0}>
+              <FileDown className="h-4 w-4 mr-2" />
+              Exportar PDF
+            </Button>
+            
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-accent hover:bg-accent/90">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Candidato
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="font-display">Cadastrar Candidato</DialogTitle>
@@ -258,6 +273,7 @@ export default function CandidatesPage() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Search */}

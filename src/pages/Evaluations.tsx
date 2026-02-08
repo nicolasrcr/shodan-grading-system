@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Eye, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, Clock, FileDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { generateEvaluationsReportPDF } from '@/utils/generateReportsPDF';
 
 interface EvaluationWithCandidate {
   id: string;
@@ -94,17 +95,43 @@ export default function EvaluationsPage() {
     e.evaluator_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleExportPDF = () => {
+    const reportData = filteredEvaluations.map(e => ({
+      candidate_name: e.candidates?.full_name || 'Candidato',
+      target_grade: e.target_grade,
+      evaluator_name: e.evaluator_name,
+      evaluation_date: e.evaluation_date,
+      nota_teorica: 0,
+      nota_pratica: 0,
+      nota_final: e.nota_final || 0,
+      status: e.status,
+    }));
+    
+    generateEvaluationsReportPDF(reportData);
+    toast({
+      title: 'PDF Gerado!',
+      description: 'Relatório de avaliações exportado com sucesso.',
+    });
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6 animate-fade-in">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">
-            Avaliações
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Histórico de avaliações realizadas
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-display font-bold text-foreground">
+              Avaliações
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Histórico de avaliações realizadas
+            </p>
+          </div>
+          
+          <Button variant="outline" onClick={handleExportPDF} disabled={filteredEvaluations.length === 0}>
+            <FileDown className="h-4 w-4 mr-2" />
+            Exportar PDF
+          </Button>
         </div>
 
         {/* Search */}
