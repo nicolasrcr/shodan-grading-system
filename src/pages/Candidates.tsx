@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { GRADE_OPTIONS, PREVIOUS_GRADES, type Candidate } from '@/types/evaluation';
 import { Plus, Search, Edit, Trash2, FileDown } from 'lucide-react';
 import { generateCandidatesReportPDF } from '@/utils/generateReportsPDF';
+import { CandidateImportDialog } from '@/components/candidates/CandidateImportDialog';
 
 export default function CandidatesPage() {
   const { toast } = useToast();
@@ -134,6 +135,8 @@ export default function CandidatesPage() {
               <FileDown className="h-4 w-4 mr-2" />
               Exportar PDF
             </Button>
+            
+            <CandidateImportDialog onImportComplete={fetchCandidates} />
             
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
