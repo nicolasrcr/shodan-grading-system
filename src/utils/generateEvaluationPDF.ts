@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { getLogoBase64 } from './pdfLogoHelper';
 
 interface EvaluationPDFData {
   candidateName: string;
@@ -17,13 +18,19 @@ interface EvaluationPDFData {
   status?: 'aprovado' | 'reprovado' | 'pendente';
 }
 
-export function generateEvaluationPDF(data: EvaluationPDFData) {
+export async function generateEvaluationPDF(data: EvaluationPDFData) {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   
   // Header
   doc.setFillColor(26, 26, 26); // primary dark
   doc.rect(0, 0, pageWidth, 40, 'F');
+  
+  // Logo
+  const logoBase64 = await getLogoBase64();
+  if (logoBase64) {
+    doc.addImage(logoBase64, 'PNG', 8, 4, 22, 32);
+  }
   
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(20);

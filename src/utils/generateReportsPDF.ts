@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { getLogoBase64 } from './pdfLogoHelper';
 
 interface CandidateReport {
   full_name: string;
@@ -33,12 +34,18 @@ interface StatsReport {
   gradeStats: { grade: string; total: number; approved: number; averageScore: number }[];
 }
 
-function addHeader(doc: jsPDF, title: string, subtitle?: string) {
+async function addHeader(doc: jsPDF, title: string, subtitle?: string) {
   const pageWidth = doc.internal.pageSize.getWidth();
   
   // Header background
   doc.setFillColor(26, 26, 26);
   doc.rect(0, 0, pageWidth, 35, 'F');
+  
+  // Logo
+  const logoBase64 = await getLogoBase64();
+  if (logoBase64) {
+    doc.addImage(logoBase64, 'PNG', 8, 3, 20, 29);
+  }
   
   // Title
   doc.setTextColor(255, 255, 255);
@@ -78,10 +85,10 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString('pt-BR');
 }
 
-export function generateCandidatesReportPDF(candidates: CandidateReport[]) {
+export async function generateCandidatesReportPDF(candidates: CandidateReport[]) {
   const doc = new jsPDF();
   
-  addHeader(doc, 'Relatório de Candidatos', `Total: ${candidates.length} candidato(s)`);
+  await addHeader(doc, 'Relatório de Candidatos', `Total: ${candidates.length} candidato(s)`);
   
   const tableData = candidates.map(c => [
     c.full_name,
@@ -124,10 +131,10 @@ export function generateCandidatesReportPDF(candidates: CandidateReport[]) {
   doc.save(`relatorio_candidatos_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
-export function generateEvaluationsReportPDF(evaluations: EvaluationReport[]) {
+export async function generateEvaluationsReportPDF(evaluations: EvaluationReport[]) {
   const doc = new jsPDF();
   
-  addHeader(doc, 'Relatório de Avaliações', `Total: ${evaluations.length} avaliação(ões)`);
+  await addHeader(doc, 'Relatório de Avaliações', `Total: ${evaluations.length} avaliação(ões)`);
   
   const statusMap: Record<string, string> = {
     aprovado: 'Aprovado',
@@ -190,10 +197,10 @@ export function generateEvaluationsReportPDF(evaluations: EvaluationReport[]) {
   doc.save(`relatorio_avaliacoes_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
-export function generateStatsReportPDF(stats: StatsReport) {
+export async function generateStatsReportPDF(stats: StatsReport) {
   const doc = new jsPDF();
   
-  addHeader(doc, 'Relatório Estatístico', 'Resumo Geral do Sistema');
+  await addHeader(doc, 'Relatório Estatístico', 'Resumo Geral do Sistema');
   
   let y = 50;
   
