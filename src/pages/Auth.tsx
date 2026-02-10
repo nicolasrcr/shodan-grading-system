@@ -97,10 +97,11 @@ export default function AuthPage() {
       <header className="w-full border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <img src="/images/federation-logo.png" alt="Logo da Federação" className="h-10 w-auto" />
             <span className="text-3xl font-display text-primary">柔道</span>
             <div className="flex flex-col">
-              <span className="text-lg font-bold text-primary font-display tracking-wide">Exame Shodan</span>
-              <span className="text-xs text-muted-foreground">Preparação para Faixa Preta</span>
+              <span className="text-lg font-bold text-primary font-display tracking-wide">SHODAN</span>
+              <span className="text-xs text-muted-foreground">Sistema de Avaliação de Graduação</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
