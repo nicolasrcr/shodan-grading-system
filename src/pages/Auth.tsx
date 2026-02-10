@@ -116,22 +116,22 @@ export default function AuthPage() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 text-primary rounded-full px-4 py-1.5 text-sm font-medium">
               <span>🥋</span>
-              <span>Sistema de Avaliação</span>
+              <span>Plataforma de Avaliação</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
-              <span className="text-foreground">Domine o{'\n'}Conteúdo do</span>
+              <span className="text-foreground">Avaliação de</span>
               <br />
-              <span className="text-accent">Exame Shodan</span>
+              <span className="text-accent">Graduação Dan</span>
             </h1>
 
             <p className="text-muted-foreground text-lg max-w-lg leading-relaxed">
-              O guia mais completo para sua preparação para a Faixa Preta 1º Dan. 
-              Todo o conhecimento teórico que você precisa em um só lugar.
+              Ferramenta completa para avaliadores conduzirem exames de graduação 
+              do 1º ao 5º Dan. Súmulas digitais, cálculo automático de notas e relatórios oficiais.
             </p>
 
             <p className="text-sm text-muted-foreground">
-              Baseado no Regulamento de Exame e Outorga de Faixas da CBJ
+              Conforme o Regulamento de Exame e Outorga de Faixas da CBJ
             </p>
           </div>
 
