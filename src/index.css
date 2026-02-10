@@ -8,120 +8,75 @@
   Preto (Faixa Preta), Vermelho (Kôdansha), Dourado (Excelência)
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Background & Surfaces */
-    --background: 0 0% 98%;
-    --foreground: 0 0% 8%;
+    /* Background - Dark elegant */
+    --background: 0 0% 7%;
+    --foreground: 43 30% 90%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card: 0 0% 10%;
+    --card-foreground: 43 30% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 43 30% 90%;
 
-    /* Primary - Preto profundo do Judogi */
-    --primary: 0 0% 8%;
-    --primary-foreground: 0 0% 98%;
+    /* Primary - Dourado #d4af37 → hsl(43, 64%, 52%) */
+    --primary: 43 64% 52%;
+    --primary-foreground: 0 0% 5%;
 
-    /* Secondary - Cinza elegante */
-    --secondary: 220 10% 94%;
-    --secondary-foreground: 0 0% 15%;
+    /* Secondary */
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 43 30% 85%;
 
-    /* Muted - Tons suaves */
-    --muted: 220 10% 96%;
-    --muted-foreground: 220 10% 45%;
+    /* Muted */
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 55%;
 
-    /* Accent - Vermelho Kôdansha */
-    --accent: 0 72% 45%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent - Vermelho escuro #8b1a1a → hsl(0, 68%, 32%) */
+    --accent: 0 68% 32%;
+    --accent-foreground: 43 30% 95%;
 
-    /* Success - Verde aprovação */
-    --success: 142 76% 36%;
+    /* Success */
+    --success: 142 50% 35%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning - Dourado tradição */
-    --warning: 45 93% 47%;
-    --warning-foreground: 0 0% 8%;
+    /* Warning - Dourado */
+    --warning: 43 64% 52%;
+    --warning-foreground: 0 0% 5%;
 
     /* Destructive */
-    --destructive: 0 84% 60%;
+    --destructive: 0 68% 42%;
     --destructive-foreground: 0 0% 98%;
 
     /* Border & Input */
-    --border: 220 13% 87%;
-    --input: 220 13% 91%;
-    --ring: 0 72% 45%;
+    --border: 43 15% 20%;
+    --input: 0 0% 16%;
+    --ring: 43 64% 52%;
 
     --radius: 0.5rem;
 
     /* Cores específicas do Judô */
-    --judo-black: 0 0% 8%;
-    --judo-red: 0 72% 45%;
-    --judo-gold: 45 93% 47%;
-    --judo-white: 0 0% 100%;
+    --judo-black: 0 0% 5%;
+    --judo-red: 0 68% 32%;
+    --judo-gold: 43 64% 52%;
+    --judo-white: 43 30% 95%;
 
     /* Gradientes */
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 8%) 0%, hsl(0 0% 18%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(0 72% 45%) 0%, hsl(0 72% 35%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(45 93% 47%) 0%, hsl(35 90% 40%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 5%) 0%, hsl(0 0% 12%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(0 68% 32%) 0%, hsl(0 68% 22%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(43 64% 52%) 0%, hsl(35 60% 42%) 100%);
 
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 8%;
-    --sidebar-primary: 0 72% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 10% 96%;
-    --sidebar-accent-foreground: 0 0% 8%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 0 72% 45%;
-  }
-
-  .dark {
-    --background: 0 0% 6%;
-    --foreground: 0 0% 95%;
-
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 95%;
-
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 95%;
-
-    --primary: 0 0% 95%;
-    --primary-foreground: 0 0% 8%;
-
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 95%;
-
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
-
-    --accent: 0 72% 50%;
-    --accent-foreground: 0 0% 100%;
-
-    --success: 142 76% 40%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 45 93% 52%;
-    --warning-foreground: 0 0% 8%;
-
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 95%;
-
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 0 72% 50%;
-
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 72% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 0 72% 50%;
+    --sidebar-background: 0 0% 9%;
+    --sidebar-foreground: 43 30% 85%;
+    --sidebar-primary: 43 64% 52%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 43 30% 90%;
+    --sidebar-border: 43 15% 18%;
+    --sidebar-ring: 43 64% 52%;
   }
 }
 
@@ -154,7 +109,7 @@
   }
   
   .evaluation-card {
-    @apply bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow;
+    @apply bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md hover:shadow-primary/10 hover:border-primary/30 transition-all duration-300;
   }
   
   .score-input {
@@ -162,7 +117,7 @@
   }
   
   .sumula-header {
-    @apply bg-gradient-to-r from-judo-black to-gray-800 text-white p-6 rounded-t-xl;
+    @apply bg-gradient-to-r from-judo-black to-secondary text-foreground p-6 rounded-t-xl border-b border-primary/20;
   }
   
   .sumula-section {

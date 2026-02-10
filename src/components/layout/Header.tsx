@@ -13,15 +13,15 @@ export function Header() {
   };
 
   return (
-    <header className="bg-gradient-to-r from-primary to-gray-800 text-primary-foreground shadow-lg">
+    <header className="bg-gradient-to-r from-background to-secondary border-b border-primary/30 text-foreground shadow-lg shadow-primary/5">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
-              <h1 className="text-2xl font-display font-bold tracking-tight">
+              <h1 className="text-2xl font-display font-bold tracking-tight text-primary">
                 SHODAN
               </h1>
-              <span className="text-xs text-primary-foreground/70 font-medium">
+              <span className="text-xs text-muted-foreground font-medium">
                 Sistema de Avaliação de Graduação
               </span>
             </div>
@@ -30,14 +30,14 @@ export function Header() {
           {user && (
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">{user.email}</span>
+                <User className="h-4 w-4 text-primary" />
+                <span className="hidden sm:inline text-muted-foreground">{user.email}</span>
               </div>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={handleSignOut}
-                className="text-primary-foreground hover:text-primary-foreground hover:bg-white/10"
+                className="text-muted-foreground hover:text-primary hover:bg-primary/10"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
