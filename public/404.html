@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <script>
+      var base = "/shodan-grading-system";
+
+      var path = location.pathname;
+      if (path.startsWith(base)) {
+        path = path.slice(base.length);
+      }
+
+      if (!location.hash) {
+        var newUrl =
+          location.origin +
+          base +
+          "/#/" +
+          path.replace(/^\/+/, "") +
+          location.search;
+
+        location.replace(newUrl);
+      }
+    </script>
+  </head>
+  <body></body>
+</html>
