@@ -19,17 +19,13 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Login state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-
-  // Signup state
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
 
-  // Redirect if already logged in
   if (user) {
     navigate('/');
     return null;
@@ -38,209 +34,177 @@ export default function AuthPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       emailSchema.parse(loginEmail);
       passwordSchema.parse(loginPassword);
     } catch (err) {
       if (err instanceof z.ZodError) {
-        toast({
-          title: 'Erro de validação',
-          description: err.errors[0].message,
-          variant: 'destructive',
-        });
+        toast({ title: 'Erro de validação', description: err.errors[0].message, variant: 'destructive' });
         setIsLoading(false);
         return;
       }
     }
-
     const { error } = await signIn(loginEmail, loginPassword);
-    
     if (error) {
       toast({
         title: 'Erro ao entrar',
-        description: error.message === 'Invalid login credentials' 
-          ? 'Email ou senha incorretos' 
-          : error.message,
+        description: error.message === 'Invalid login credentials' ? 'Email ou senha incorretos' : error.message,
         variant: 'destructive',
       });
     } else {
-      toast({
-        title: 'Bem-vindo!',
-        description: 'Login realizado com sucesso.',
-      });
+      toast({ title: 'Bem-vindo!', description: 'Login realizado com sucesso.' });
       navigate('/');
     }
-    
     setIsLoading(false);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       nameSchema.parse(signupName);
       emailSchema.parse(signupEmail);
       passwordSchema.parse(signupPassword);
     } catch (err) {
       if (err instanceof z.ZodError) {
-        toast({
-          title: 'Erro de validação',
-          description: err.errors[0].message,
-          variant: 'destructive',
-        });
+        toast({ title: 'Erro de validação', description: err.errors[0].message, variant: 'destructive' });
         setIsLoading(false);
         return;
       }
     }
-
     if (signupPassword !== signupConfirmPassword) {
-      toast({
-        title: 'Erro',
-        description: 'As senhas não coincidem.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Erro', description: 'As senhas não coincidem.', variant: 'destructive' });
       setIsLoading(false);
       return;
     }
-
     const { error } = await signUp(signupEmail, signupPassword, signupName);
-    
     if (error) {
       let message = error.message;
-      if (error.message.includes('already registered')) {
-        message = 'Este email já está cadastrado.';
-      }
-      toast({
-        title: 'Erro ao cadastrar',
-        description: message,
-        variant: 'destructive',
-      });
+      if (error.message.includes('already registered')) message = 'Este email já está cadastrado.';
+      toast({ title: 'Erro ao cadastrar', description: message, variant: 'destructive' });
     } else {
-      toast({
-        title: 'Cadastro realizado!',
-        description: 'Verifique seu email para confirmar a conta.',
-      });
+      toast({ title: 'Cadastro realizado!', description: 'Verifique seu email para confirmar a conta.' });
     }
-    
     setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-gray-900 to-primary flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold text-white mb-2">
-            SHODAN
-          </h1>
-          <p className="text-white/70">
-            Sistema de Avaliação de Graduação de Judô
-          </p>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Top red bar */}
+      <div className="w-full h-1.5 bg-accent" />
+
+      {/* Header */}
+      <header className="w-full border-b border-border bg-card/80 backdrop-blur-sm">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-display text-primary">柔道</span>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold text-primary font-display tracking-wide">Exame Shodan</span>
+              <span className="text-xs text-muted-foreground">Preparação para Faixa Preta</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground border border-border rounded-full px-3 py-1">PT</span>
+          </div>
         </div>
+      </header>
 
-        <Card className="shadow-2xl">
-          <CardHeader className="text-center">
-            <CardTitle className="font-display">Área do Avaliador</CardTitle>
-            <CardDescription>
-              Entre com suas credenciais para acessar o sistema
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Entrar</TabsTrigger>
-                <TabsTrigger value="signup">Cadastrar</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
-                    <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="seu@email.com"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Senha</Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Entrando...' : 'Entrar'}
-                  </Button>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">Nome Completo</Label>
-                    <Input
-                      id="signup-name"
-                      type="text"
-                      placeholder="Seu nome"
-                      value={signupName}
-                      onChange={(e) => setSignupName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="seu@email.com"
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Senha</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-confirm">Confirmar Senha</Label>
-                    <Input
-                      id="signup-confirm"
-                      type="password"
-                      placeholder="••••••••"
-                      value={signupConfirmPassword}
-                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Cadastrando...' : 'Cadastrar'}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+      {/* Main content */}
+      <main className="flex-1 flex items-center">
+        <div className="container mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left - Hero text */}
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 text-primary rounded-full px-4 py-1.5 text-sm font-medium">
+              <span>🥋</span>
+              <span>Sistema de Avaliação</span>
+            </div>
 
-        <p className="text-center text-white/50 text-sm mt-6">
-          Baseado no Regulamento de Exame e Outorga de Faixas da CBJ
-        </p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
+              <span className="text-foreground">Domine o{'\n'}Conteúdo do</span>
+              <br />
+              <span className="text-accent">Exame Shodan</span>
+            </h1>
+
+            <p className="text-muted-foreground text-lg max-w-lg leading-relaxed">
+              O guia mais completo para sua preparação para a Faixa Preta 1º Dan. 
+              Todo o conhecimento teórico que você precisa em um só lugar.
+            </p>
+
+            <p className="text-sm text-muted-foreground">
+              Baseado no Regulamento de Exame e Outorga de Faixas da CBJ
+            </p>
+          </div>
+
+          {/* Right - Auth card */}
+          <div className="flex justify-center lg:justify-end">
+            <Card className="w-full max-w-md border-primary/20 shadow-2xl shadow-primary/5">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto mb-3 text-4xl font-display text-primary">講道館</div>
+                <CardTitle className="font-display text-2xl text-primary">SHODAN</CardTitle>
+                <CardDescription>Área do Avaliador</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="login" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="login">Entrar</TabsTrigger>
+                    <TabsTrigger value="signup">Cadastrar</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="login">
+                    <form onSubmit={handleLogin} className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="login-email">Email</Label>
+                        <Input id="login-email" type="email" placeholder="seu@email.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="login-password">Senha</Label>
+                        <Input id="login-password" type="password" placeholder="••••••••" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
+                      </div>
+                      <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
+                        {isLoading ? 'Entrando...' : 'Entrar'}
+                      </Button>
+                    </form>
+                  </TabsContent>
+
+                  <TabsContent value="signup">
+                    <form onSubmit={handleSignup} className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-name">Nome Completo</Label>
+                        <Input id="signup-name" type="text" placeholder="Seu nome" value={signupName} onChange={(e) => setSignupName(e.target.value)} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email">Email</Label>
+                        <Input id="signup-email" type="email" placeholder="seu@email.com" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password">Senha</Label>
+                        <Input id="signup-password" type="password" placeholder="••••••••" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-confirm">Confirmar Senha</Label>
+                        <Input id="signup-confirm" type="password" placeholder="••••••••" value={signupConfirmPassword} onChange={(e) => setSignupConfirmPassword(e.target.value)} required />
+                      </div>
+                      <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
+                        {isLoading ? 'Cadastrando...' : 'Cadastrar'}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+
+      {/* Bottom accent with kanji */}
+      <div className="w-full border-t border-border py-4">
+        <div className="container mx-auto px-6 flex items-center justify-between">
+          <span className="text-muted-foreground text-sm">© SHODAN - Sistema de Avaliação de Graduação de Judô</span>
+          <div className="text-right">
+            <span className="text-2xl font-display text-primary/60">初段</span>
+            <p className="text-xs text-muted-foreground">Primeiro Dan</p>
+          </div>
+        </div>
       </div>
     </div>
   );
