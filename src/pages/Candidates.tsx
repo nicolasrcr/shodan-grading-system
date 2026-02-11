@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { GRADE_OPTIONS, PREVIOUS_GRADES, type Candidate } from '@/types/evaluation';
@@ -108,12 +109,19 @@ export default function CandidatesPage() {
     c.federation.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleDelete = async (id: string, name: string) => {
+    const { error } = await supabase.from('candidates').delete().eq('id', id);
+    if (error) {
+      toast({ title: 'Erro ao excluir', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Candidato excluído', description: `${name} foi removido com sucesso.` });
+      fetchCandidates();
+    }
+  };
+
   const handleExportPDF = () => {
     generateCandidatesReportPDF(filteredCandidates);
-    toast({
-      title: 'PDF Gerado!',
-      description: 'Relatório de candidatos exportado com sucesso.',
-    });
+    toast({ title: 'PDF Gerado!', description: 'Relatório de candidatos exportado com sucesso.' });
   };
 
   return (
@@ -335,6 +343,27 @@ export default function CandidatesPage() {
                       <div className="hidden lg:block">
                         <span>{candidate.accumulated_points} pts</span>
                       </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80 hover:bg-destructive/10">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Excluir candidato?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja excluir <strong>{candidate.full_name}</strong>? Esta ação não pode ser desfeita.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(candidate.id, candidate.full_name)} className="bg-destructive hover:bg-destructive/90">
+                              Excluir
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 </CardContent>
