@@ -20,6 +20,7 @@ export default function CandidatesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -69,39 +70,88 @@ export default function CandidatesPage() {
       return;
     }
 
-    const { error } = await supabase.from('candidates').insert({
-      ...formData,
-      email: formData.email || null,
-      association: formData.association || null,
-      zempo_registration: formData.zempo_registration || null,
-    });
+    if (editingId) {
+      // Update existing candidate
+      const { error } = await supabase.from('candidates').update({
+        ...formData,
+        email: formData.email || null,
+        association: formData.association || null,
+        zempo_registration: formData.zempo_registration || null,
+      }).eq('id', editingId);
 
-    if (error) {
-      toast({
-        title: 'Erro ao cadastrar',
-        description: error.message,
-        variant: 'destructive',
-      });
+      if (error) {
+        toast({
+          title: 'Erro ao atualizar',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Candidato atualizado!',
+          description: 'Os dados foram atualizados com sucesso.',
+        });
+        setIsDialogOpen(false);
+        setEditingId(null);
+        resetForm();
+        fetchCandidates();
+      }
     } else {
-      toast({
-        title: 'Candidato cadastrado!',
-        description: 'O candidato foi adicionado com sucesso.',
+      // Create new candidate
+      const { error } = await supabase.from('candidates').insert({
+        ...formData,
+        email: formData.email || null,
+        association: formData.association || null,
+        zempo_registration: formData.zempo_registration || null,
       });
-      setIsDialogOpen(false);
-      setFormData({
-        full_name: '',
-        email: '',
-        birth_date: '',
-        federation: '',
-        association: '',
-        current_grade: '1º KYÛ',
-        target_grade: '1º DAN',
-        zempo_registration: '',
-        registration_years: 0,
-        accumulated_points: 0,
-      });
-      fetchCandidates();
+
+      if (error) {
+        toast({
+          title: 'Erro ao cadastrar',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Candidato cadastrado!',
+          description: 'O candidato foi adicionado com sucesso.',
+        });
+        setIsDialogOpen(false);
+        resetForm();
+        fetchCandidates();
+      }
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      full_name: '',
+      email: '',
+      birth_date: '',
+      federation: '',
+      association: '',
+      current_grade: '1º KYÛ',
+      target_grade: '1º DAN',
+      zempo_registration: '',
+      registration_years: 0,
+      accumulated_points: 0,
+    });
+  };
+
+  const openEditDialog = (candidate: Candidate) => {
+    setFormData({
+      full_name: candidate.full_name,
+      email: candidate.email || '',
+      birth_date: candidate.birth_date,
+      federation: candidate.federation,
+      association: candidate.association || '',
+      current_grade: candidate.current_grade,
+      target_grade: candidate.target_grade,
+      zempo_registration: candidate.zempo_registration || '',
+      registration_years: candidate.registration_years || 0,
+      accumulated_points: candidate.accumulated_points || 0,
+    });
+    setEditingId(candidate.id);
+    setIsDialogOpen(true);
   };
 
   const filteredCandidates = candidates.filter(c => 
@@ -146,7 +196,13 @@ export default function CandidatesPage() {
             
             <CandidateImportDialog onImportComplete={fetchCandidates} />
             
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) {
+                setEditingId(null);
+                resetForm();
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button className="bg-accent hover:bg-accent/90">
                   <Plus className="h-4 w-4 mr-2" />
@@ -155,7 +211,9 @@ export default function CandidatesPage() {
               </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="font-display">Cadastrar Candidato</DialogTitle>
+                <DialogTitle className="font-display">
+                  {editingId ? 'Editar Candidato' : 'Cadastrar Candidato'}
+                </DialogTitle>
               </DialogHeader>
               
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -343,6 +401,14 @@ export default function CandidatesPage() {
                       <div className="hidden lg:block">
                         <span>{candidate.accumulated_points} pts</span>
                       </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => openEditDialog(candidate)}
+                        className="text-primary hover:text-primary/80 hover:bg-primary/10"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80 hover:bg-destructive/10">
