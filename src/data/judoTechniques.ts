@@ -1,0 +1,163 @@
+// Técnicas de judô organizadas por categoria (Gokyo + Katame-waza)
+// Baseado na planilha oficial de técnicas
+
+export interface JudoTechnique {
+  name: string;
+  videoUrl?: string;
+}
+
+export interface TechniqueCategory {
+  category: string;
+  techniques: JudoTechnique[];
+}
+
+export const JUDO_TECHNIQUES: TechniqueCategory[] = [
+  {
+    category: 'Ashi-waza',
+    techniques: [
+      { name: 'Ashi-guruma', videoUrl: 'https://www.youtube.com/watch?v=ROeayhvom9U' },
+      { name: 'De-ashi-harai', videoUrl: 'https://www.youtube.com/watch?v=4BUUvqxi_Kk' },
+      { name: 'Hane-goshi-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=9bZAZSBtnGs' },
+      { name: 'Harai-goshi-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=4U3It-7PPsc' },
+      { name: 'Harai-tsurikomi-ashi', videoUrl: 'https://www.youtube.com/watch?v=gGPXvWL8VbE' },
+      { name: 'Hiza-guruma', videoUrl: 'https://www.youtube.com/watch?v=JPJx9-oAVns' },
+      { name: 'Ko-soto-gake', videoUrl: 'https://www.youtube.com/watch?v=8b6kY4s4zH4' },
+      { name: 'Ko-soto-gari', videoUrl: 'https://www.youtube.com/watch?v=jeQ541ScLB4' },
+      { name: 'Ko-uchi-gari', videoUrl: 'https://www.youtube.com/watch?v=3Jb3tZvr9Ng' },
+      { name: 'O-guruma', videoUrl: 'https://www.youtube.com/watch?v=SnZciTAY9vc' },
+      { name: 'O-soto-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=8ZjM3X_EANo' },
+      { name: 'O-soto-gari', videoUrl: 'https://www.youtube.com/watch?v=c-A_nP7mKAc' },
+      { name: 'O-soto-guruma', videoUrl: 'https://www.youtube.com/watch?v=92KbCm6pQeI' },
+      { name: 'O-soto-otoshi', videoUrl: 'https://www.youtube.com/watch?v=2DsVvDw7b8g' },
+      { name: 'O-uchi-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=dCyZTXyjIXE' },
+      { name: 'O-uchi-gari', videoUrl: 'https://www.youtube.com/watch?v=0itJFhV9pDQ' },
+      { name: 'Okuri-ashi-harai', videoUrl: 'https://www.youtube.com/watch?v=nw1ZdRjrdRI' },
+      { name: 'Sasae-tsurikomi-ashi', videoUrl: 'https://www.youtube.com/watch?v=699i--pvYmE' },
+      { name: 'Tsubame-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=GwweWqqFB5g' },
+      { name: 'Uchi-mata', videoUrl: 'https://www.youtube.com/watch?v=iUpSu5J-bgw' },
+      { name: 'Uchi-mata-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=Sy6sLWxkWYw' },
+    ],
+  },
+  {
+    category: 'Kansetsu-waza',
+    techniques: [
+      { name: 'Ashi-garami', videoUrl: 'https://www.youtube.com/watch?v=BWWb0GoAtZw' },
+      { name: 'Ude-garami', videoUrl: 'https://www.youtube.com/watch?v=AIlTvZb4RlE' },
+      { name: 'Ude-hishigi-ashi-gatame', videoUrl: 'https://www.youtube.com/watch?v=ClY7g_pX-4s' },
+      { name: 'Ude-hishigi-hara-gatame', videoUrl: 'https://www.youtube.com/watch?v=ZzEycg8R_9M' },
+      { name: 'Ude-hishigi-hiza-gatame', videoUrl: 'https://www.youtube.com/watch?v=H2HtAJdiJcE' },
+      { name: 'Ude-hishigi-juji-gatame', videoUrl: 'https://www.youtube.com/watch?v=OWgSOlCuMXw' },
+      { name: 'Ude-hishigi-sankaku-gatame', videoUrl: 'https://www.youtube.com/watch?v=WefAmW4azhk' },
+      { name: 'Ude-hishigi-te-gatame', videoUrl: 'https://www.youtube.com/watch?v=6DnvhY0tQVM' },
+      { name: 'Ude-hishigi-ude-gatame', videoUrl: 'https://www.youtube.com/watch?v=SBf0aTma1VI' },
+      { name: 'Ude-hishigi-waki-gatame', videoUrl: 'https://www.youtube.com/watch?v=8F5p1zuJRG0' },
+    ],
+  },
+  {
+    category: 'Koshi-waza',
+    techniques: [
+      { name: 'Hane-goshi', videoUrl: 'https://www.youtube.com/watch?v=M9_7De6A1kk' },
+      { name: 'Harai-goshi', videoUrl: 'https://www.youtube.com/watch?v=qTo8HlAAkOo' },
+      { name: 'Koshi-guruma', videoUrl: 'https://www.youtube.com/watch?v=SU7Id6uVJ44' },
+      { name: 'O-goshi', videoUrl: 'https://www.youtube.com/watch?v=yhu1mfy2vJ4' },
+      { name: 'Sode-tsurikomi-goshi', videoUrl: 'https://www.youtube.com/watch?v=QsmAxpmYLOI' },
+      { name: 'Tsuri-goshi', videoUrl: 'https://www.youtube.com/watch?v=51Htlp7xEvE' },
+      { name: 'Tsurikomi-goshi', videoUrl: 'https://www.youtube.com/watch?v=McfzA0yRVt4' },
+      { name: 'Uki-goshi', videoUrl: 'https://www.youtube.com/watch?v=bPKwtB4lyOQ' },
+      { name: 'Ushiro-goshi', videoUrl: 'https://www.youtube.com/watch?v=ORIYstuxYT8' },
+      { name: 'Utsuri-goshi', videoUrl: 'https://www.youtube.com/watch?v=4pQd_bEnlf0' },
+    ],
+  },
+  {
+    category: 'Ma-sutemi-waza',
+    techniques: [
+      { name: 'Hikikomi-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=92zUYWBp5N8' },
+      { name: 'Sumi-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=5VhduA5xkbA' },
+      { name: 'Tawara-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=TmTWgrmViZc' },
+      { name: 'Tomoe-nage', videoUrl: 'https://www.youtube.com/watch?v=880WbHvHv6A' },
+      { name: 'Ura-nage', videoUrl: 'https://www.youtube.com/watch?v=Fgi9b8DJ5sQ' },
+    ],
+  },
+  {
+    category: 'Osaekomi-waza',
+    techniques: [
+      { name: 'Kami-shiho-gatame', videoUrl: 'https://www.youtube.com/watch?v=HFuMjOv0WN8' },
+      { name: 'Kata-gatame', videoUrl: 'https://www.youtube.com/watch?v=zQR3IOXxO_Q' },
+      { name: 'Kesa-gatame', videoUrl: 'https://www.youtube.com/watch?v=NDaQuJOFBYk' },
+      { name: 'Kuzure-kami-shiho-gatame', videoUrl: 'https://www.youtube.com/watch?v=YUrogQWdwiY' },
+      { name: 'Kuzure-kesa-gatame', videoUrl: 'https://www.youtube.com/watch?v=Q2fb9jaoUFQ' },
+      { name: 'Tate-shiho-gatame', videoUrl: 'https://www.youtube.com/watch?v=55-rFmBx53g' },
+      { name: 'Uki-gatame', videoUrl: 'https://www.youtube.com/watch?v=e_lAjik1SUM' },
+      { name: 'Ura-gatame', videoUrl: 'https://www.youtube.com/watch?v=eeAHZB0v3XY' },
+      { name: 'Ushiro-kesa-gatame', videoUrl: 'https://www.youtube.com/watch?v=SBapox2M2dE' },
+      { name: 'Yoko-shiho-gatame', videoUrl: 'https://www.youtube.com/watch?v=TT7XJVSEQxA' },
+    ],
+  },
+  {
+    category: 'Shime-waza',
+    techniques: [
+      { name: 'Do-jime', videoUrl: 'https://www.youtube.com/watch?v=D_0fFcoIbvY' },
+      { name: 'Gyaku-juji-jime', videoUrl: 'https://www.youtube.com/watch?v=t3tQriIPdlI' },
+      { name: 'Hadaka-jime', videoUrl: 'https://www.youtube.com/watch?v=9f0n8jez7iA' },
+      { name: 'Kata-juji-jime', videoUrl: 'https://www.youtube.com/watch?v=3VZVUAmiMD8' },
+      { name: 'Kataha-jime', videoUrl: 'https://www.youtube.com/watch?v=yaTGgRjnwB8' },
+      { name: 'Katate-jime', videoUrl: 'https://www.youtube.com/watch?v=cHeIs-fSqwE' },
+      { name: 'Nami-juji-jime', videoUrl: 'https://www.youtube.com/watch?v=k2cHry9HByQ' },
+      { name: 'Okuri-eri-jime', videoUrl: 'https://www.youtube.com/watch?v=EiqyoVcIAi8' },
+      { name: 'Ryote-jime', videoUrl: 'https://www.youtube.com/watch?v=-RHC4V7TQiY' },
+      { name: 'Sankaku-jime', videoUrl: 'https://www.youtube.com/watch?v=lq1CUBRAm7s' },
+      { name: 'Sode-guruma-jime', videoUrl: 'https://www.youtube.com/watch?v=E3nvQzClcAU' },
+      { name: 'Tsukkomi-jime', videoUrl: 'https://www.youtube.com/watch?v=dKKpnD3eLcY' },
+    ],
+  },
+  {
+    category: 'Te-waza',
+    techniques: [
+      { name: 'Ippon-seoi-nage', videoUrl: 'https://www.youtube.com/watch?v=FQnOlCxo4oI' },
+      { name: 'Kata-guruma', videoUrl: 'https://www.youtube.com/watch?v=cnHRhSy8yi4' },
+      { name: 'Kibisu-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=tJylJYfBliA' },
+      { name: 'Ko-uchi-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=_MWAdYi_LC4' },
+      { name: 'Kuchiki-taoshi', videoUrl: 'https://www.youtube.com/watch?v=ZNL47q1aJNY' },
+      { name: 'Morote-gari', videoUrl: 'https://www.youtube.com/watch?v=BHLQS4K85bs' },
+      { name: 'Obi-otoshi', videoUrl: 'https://www.youtube.com/watch?v=ff8U2TVZIYI' },
+      { name: 'Obi-tori-gaeshi', videoUrl: 'https://www.youtube.com/watch?v=bpc82SrunUU' },
+      { name: 'Seoi-nage', videoUrl: 'https://www.youtube.com/watch?v=zIq0xI0ogxk' },
+      { name: 'Seoi-otoshi', videoUrl: 'https://www.youtube.com/watch?v=vu1TMVNnq34' },
+      { name: 'Sukui-nage', videoUrl: 'https://www.youtube.com/watch?v=vU6aJ2kFxoI' },
+      { name: 'Sumi-otoshi', videoUrl: 'https://www.youtube.com/watch?v=lLU9wv52ni0' },
+      { name: 'Tai-otoshi', videoUrl: 'https://www.youtube.com/watch?v=4x6S3Q-Ktv8' },
+      { name: 'Uchi-mata-sukashi', videoUrl: 'https://www.youtube.com/watch?v=V-RS3uhtVWM' },
+      { name: 'Uki-otoshi', videoUrl: 'https://www.youtube.com/watch?v=6H5tmncOY4Q' },
+      { name: 'Yama-arashi', videoUrl: 'https://www.youtube.com/watch?v=MGlyKmSuzdc' },
+    ],
+  },
+  {
+    category: 'Yoko-sutemi-waza',
+    techniques: [
+      { name: 'Daki-wakare', videoUrl: 'https://www.youtube.com/watch?v=Hr0cOMGBDYo' },
+      { name: 'Hane-makikomi', videoUrl: 'https://www.youtube.com/watch?v=6CRBGLGz9j8' },
+      { name: 'Harai-makikomi', videoUrl: 'https://www.youtube.com/watch?v=VBaHzKaCXss' },
+      { name: 'Kani-basami', videoUrl: 'https://www.youtube.com/watch?v=OR-HGHnarYc' },
+      { name: 'Kawazu-gake', videoUrl: 'https://www.youtube.com/watch?v=w6G57bWACi0' },
+      { name: 'Ko-uchi-makikomi', videoUrl: 'https://www.youtube.com/watch?v=_1eygIXLD_w' },
+      { name: 'O-soto-makikomi', videoUrl: 'https://www.youtube.com/watch?v=DGDv2oMwmas' },
+      { name: 'Soto-makikomi', videoUrl: 'https://www.youtube.com/watch?v=bWG9O1BVKtQ' },
+      { name: 'Tani-otoshi', videoUrl: 'https://www.youtube.com/watch?v=3b9Me3Fohpk' },
+      { name: 'Uchi-makikomi', videoUrl: 'https://www.youtube.com/watch?v=5BowcjduxVc' },
+      { name: 'Uchi-mata-makikomi', videoUrl: 'https://www.youtube.com/watch?v=jZXENTLpJCI' },
+      { name: 'Uki-waza', videoUrl: 'https://www.youtube.com/watch?v=weVOpJ63gII' },
+      { name: 'Yoko-gake', videoUrl: 'https://www.youtube.com/watch?v=tP1Sj1uDfSo' },
+      { name: 'Yoko-guruma', videoUrl: 'https://www.youtube.com/watch?v=MehP6I5cY2c' },
+      { name: 'Yoko-otoshi', videoUrl: 'https://www.youtube.com/watch?v=MnNG67pF_a0' },
+      { name: 'Yoko-wakare', videoUrl: 'https://www.youtube.com/watch?v=bp1tscHlePI' },
+    ],
+  },
+];
+
+// Helper para obter categorias como opções de select
+export const getCategoryOptions = () =>
+  JUDO_TECHNIQUES.map((cat) => cat.category);
+
+// Helper para obter técnicas de uma categoria
+export const getTechniquesByCategory = (category: string) =>
+  JUDO_TECHNIQUES.find((cat) => cat.category === category)?.techniques || [];

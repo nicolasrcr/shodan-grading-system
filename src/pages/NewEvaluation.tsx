@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { GRADE_OPTIONS } from '@/types/evaluation';
 import { CheckCircle, XCircle, Save, FileDown } from 'lucide-react';
 import { generateEvaluationPDF } from '@/utils/generateEvaluationPDF';
+import { TechniqueScoring, type TechniqueScore } from '@/components/evaluation/TechniqueScoring';
 
 interface EvaluationFields {
   // Teoria
@@ -138,6 +139,7 @@ export default function NewEvaluation() {
   const [evaluationDate, setEvaluationDate] = useState(new Date().toISOString().split('T')[0]);
   const [observations, setObservations] = useState('');
   const [fields, setFields] = useState<EvaluationFields>(initialFields);
+  const [techniqueScores, setTechniqueScores] = useState<TechniqueScore[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -434,6 +436,18 @@ export default function NewEvaluation() {
                 <span className="font-medium">Média Prática:</span>
                 <span className="text-xl font-bold">{notaPratica.toFixed(2)}</span>
               </div>
+            </div>
+
+            {/* Avaliação de Técnicas Individuais */}
+            <div className="sumula-section">
+              <h3 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 bg-primary rounded-full"></span>
+                Avaliação de Técnicas
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Selecione o grupo de técnicas e adicione as técnicas avaliadas com suas respectivas notas.
+              </p>
+              <TechniqueScoring scores={techniqueScores} onChange={setTechniqueScores} />
             </div>
 
             {/* Resultado Final */}
