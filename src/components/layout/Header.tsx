@@ -18,9 +18,9 @@ export function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
-              <h1 className="text-2xl font-display font-bold tracking-tight text-primary">
-                SHODAN
-              </h1>
+               <h1 className="text-2xl font-display font-bold tracking-tight text-primary">
+                 ShodanAvalia
+               </h1>
               <span className="text-xs text-muted-foreground font-medium">
                 Sistema de Avaliação de Graduação
               </span>

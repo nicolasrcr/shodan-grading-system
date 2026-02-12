@@ -51,7 +51,7 @@ async function addHeader(doc: jsPDF, title: string, subtitle?: string) {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('SHODAN - Sistema de Avaliação', pageWidth / 2, 14, { align: 'center' });
+  doc.text('ShodanAvalia - Sistema de Avaliação', pageWidth / 2, 14, { align: 'center' });
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');

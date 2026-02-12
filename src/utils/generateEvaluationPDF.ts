@@ -212,7 +212,7 @@ export async function generateEvaluationPDF(data: EvaluationPDFData) {
     285,
     { align: 'center' }
   );
-  doc.text('SHODAN - Sistema de Avaliação de Graduação', pageWidth / 2, 290, { align: 'center' });
+  doc.text('ShodanAvalia - Sistema de Avaliação de Graduação', pageWidth / 2, 290, { align: 'center' });
   
   // Save the PDF
   const fileName = `sumula_${data.candidateName.replace(/\s+/g, '_')}_${data.targetGrade.replace(/\s+/g, '_')}_${data.evaluationDate}.pdf`;
