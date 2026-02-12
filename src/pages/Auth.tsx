@@ -99,7 +99,7 @@ export default function AuthPage() {
           <div className="flex items-center gap-3">
             <span className="text-3xl font-display text-primary">柔道</span>
             <div className="flex flex-col">
-              <span className="text-lg font-bold text-primary font-display tracking-wide">Exame Shodan</span>
+              <span className="text-lg font-bold text-primary font-display tracking-wide">ShodanAvalia</span>
               <span className="text-xs text-muted-foreground">Preparação para Faixa Preta</span>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function AuthPage() {
             <Card className="w-full max-w-md border-primary/20 shadow-2xl shadow-primary/5">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-3 text-4xl font-display text-primary">講道館</div>
-                <CardTitle className="font-display text-2xl text-primary">SHODAN</CardTitle>
+                <CardTitle className="font-display text-2xl text-primary">ShodanAvalia</CardTitle>
                 <CardDescription>Área do Avaliador</CardDescription>
               </CardHeader>
               <CardContent>
@@ -199,7 +199,7 @@ export default function AuthPage() {
       {/* Bottom accent with kanji */}
       <div className="w-full border-t border-border py-4">
         <div className="container mx-auto px-6 flex items-center justify-between">
-          <span className="text-muted-foreground text-sm">© SHODAN - Sistema de Avaliação de Graduação de Judô</span>
+          <span className="text-muted-foreground text-sm">© ShodanAvalia - Sistema de Avaliação de Graduação de Judô</span>
           <div className="text-right">
             <span className="text-2xl font-display text-primary/60">初段</span>
             <p className="text-xs text-muted-foreground">Primeiro Dan</p>
