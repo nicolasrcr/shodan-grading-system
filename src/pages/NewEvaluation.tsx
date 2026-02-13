@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { GRADE_OPTIONS } from '@/types/evaluation';
 import { CheckCircle, XCircle, Save, FileDown } from 'lucide-react';
 import { generateEvaluationPDF } from '@/utils/generateEvaluationPDF';
-import { TechniqueScoring, type TechniqueScore } from '@/components/evaluation/TechniqueScoring';
+import { PracticalSectionScoring, type GroupTechniqueScore } from '@/components/evaluation/PracticalSectionScoring';
 
 interface EvaluationFields {
   // Teoria
@@ -119,6 +119,19 @@ const fieldLabels: Record<string, string> = {
   pratica_pedagogia: 'Conhecimentos Didáticos e Pedagógicos',
 };
 
+// Mapeamento de campos práticos para categorias de técnicas
+const practicalFieldCategories: Record<string, string[]> = {
+  pratica_nage_no_kata: ['Te-waza', 'Koshi-waza', 'Ashi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
+  pratica_katame_no_kata: ['Osaekomi-waza', 'Shime-waza', 'Kansetsu-waza'],
+  pratica_ju_no_kata: ['Te-waza', 'Koshi-waza', 'Ashi-waza'],
+  pratica_kime_no_kata: ['Te-waza', 'Koshi-waza', 'Ashi-waza'],
+  pratica_goshin_jutsu: ['Te-waza', 'Koshi-waza', 'Ashi-waza', 'Kansetsu-waza'],
+  pratica_nage_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
+  pratica_renraku_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
+  pratica_kaeshi_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
+  pratica_katame_waza: ['Osaekomi-waza', 'Shime-waza', 'Kansetsu-waza'],
+};
+
 interface Candidate {
   id: string;
   full_name: string;
@@ -139,7 +152,7 @@ export default function NewEvaluation() {
   const [evaluationDate, setEvaluationDate] = useState(new Date().toISOString().split('T')[0]);
   const [observations, setObservations] = useState('');
   const [fields, setFields] = useState<EvaluationFields>(initialFields);
-  const [techniqueScores, setTechniqueScores] = useState<TechniqueScore[]>([]);
+  const [practicalTechniques, setPracticalTechniques] = useState<Record<string, GroupTechniqueScore[]>>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -174,22 +187,37 @@ export default function NewEvaluation() {
     return values.reduce((a, b) => a + b, 0) / values.length;
   };
 
+  // Calcular média de técnicas por grupo prático
+  const calculatePracticalGroupAverage = (field: string): number => {
+    const techs = practicalTechniques[field] || [];
+    const valid = techs.filter(s => s.score !== '' && !isNaN(parseFloat(s.score)));
+    if (valid.length === 0) return parseFloat(fields[field as keyof EvaluationFields] || '0');
+    return valid.reduce((sum, s) => sum + parseFloat(s.score), 0) / valid.length;
+  };
+
   const gradeFields = getFieldsByGrade(selectedGrade);
   const notaTeorica = calculateAverage(gradeFields.teoria);
-  const notaPratica = calculateAverage(gradeFields.pratica);
-
-  // Média das técnicas individuais
-  const techniqueAverage = (() => {
-    const valid = techniqueScores.filter(s => s.score !== '' && !isNaN(parseFloat(s.score)));
-    if (valid.length === 0) return 0;
-    return valid.reduce((sum, s) => sum + parseFloat(s.score), 0) / valid.length;
+  
+  // Média prática: usa média das técnicas de cada grupo quando disponível
+  const notaPratica = (() => {
+    const values = gradeFields.pratica
+      .map(f => calculatePracticalGroupAverage(f))
+      .filter(v => !isNaN(v) && v > 0);
+    if (values.length === 0) return 0;
+    return values.reduce((a, b) => a + b, 0) / values.length;
   })();
 
-  const hasTechniqueScores = techniqueScores.some(s => s.score !== '');
-  // Se há técnicas avaliadas, média ponderada: (teórica + prática + técnicas) / 3
-  const notaFinal = hasTechniqueScores
-    ? (notaTeorica + notaPratica + techniqueAverage) / 3
-    : (notaTeorica + notaPratica) / 2;
+  const notaFinal = (notaTeorica + notaPratica) / 2;
+
+  const handleUpdatePracticalTechniques = (field: string, scores: GroupTechniqueScore[]) => {
+    setPracticalTechniques(prev => ({ ...prev, [field]: scores }));
+    // Auto-update the field score with the average
+    const valid = scores.filter(s => s.score !== '' && !isNaN(parseFloat(s.score)));
+    if (valid.length > 0) {
+      const avg = valid.reduce((sum, s) => sum + parseFloat(s.score), 0) / valid.length;
+      setFields(prev => ({ ...prev, [field]: avg.toFixed(2) }));
+    }
+  };
 
   const handleGeneratePDF = () => {
     const candidateName = candidates.find(c => c.id === selectedCandidate)?.full_name || 'Candidato';
@@ -217,7 +245,13 @@ export default function NewEvaluation() {
       notaTeorica,
       notaPratica,
       notaFinal,
-      techniqueScores: techniqueScores.filter(s => s.score !== ''),
+      techniqueScores: Object.entries(practicalTechniques).flatMap(([field, techs]) =>
+        techs.filter(t => t.score !== '').map(t => ({
+          category: fieldLabels[field] || field,
+          technique: t.technique,
+          score: t.score,
+        }))
+      ),
     });
 
     toast({
@@ -428,39 +462,45 @@ export default function NewEvaluation() {
                 <span className="w-2 h-2 bg-success rounded-full"></span>
                 Prova Prática
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {gradeFields.pratica.map((field) => (
-                  <div key={field} className="space-y-2">
-                    <Label className="text-sm">{fieldLabels[field]}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="10"
-                      step="0.5"
-                      value={fields[field as keyof EvaluationFields]}
-                      onChange={(e) => handleFieldChange(field as keyof EvaluationFields, e.target.value)}
-                      className="score-input w-full"
-                      placeholder="0-10"
-                    />
-                  </div>
-                ))}
+              <p className="text-sm text-muted-foreground mb-4">
+                Expanda cada grupo para adicionar técnicas individuais com suas notas.
+              </p>
+              <div className="space-y-3">
+                {gradeFields.pratica.map((field) => {
+                  const categories = practicalFieldCategories[field];
+                  if (categories) {
+                    return (
+                      <PracticalSectionScoring
+                        key={field}
+                        label={fieldLabels[field]}
+                        techniqueCategories={categories}
+                        scores={practicalTechniques[field] || []}
+                        onChange={(scores) => handleUpdatePracticalTechniques(field, scores)}
+                      />
+                    );
+                  }
+                  // Campos sem técnicas (arbitragem, pedagogia) ficam como input simples
+                  return (
+                    <div key={field} className="border border-border rounded-lg px-4 py-3 flex items-center justify-between">
+                      <Label className="text-sm font-semibold">{fieldLabels[field]}</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.5"
+                        value={fields[field as keyof EvaluationFields]}
+                        onChange={(e) => handleFieldChange(field as keyof EvaluationFields, e.target.value)}
+                        className="w-24 text-center"
+                        placeholder="0-10"
+                      />
+                    </div>
+                  );
+                })}
               </div>
               <div className="mt-4 p-3 bg-secondary rounded-lg flex items-center justify-between">
                 <span className="font-medium">Média Prática:</span>
                 <span className="text-xl font-bold">{notaPratica.toFixed(2)}</span>
               </div>
-            </div>
-
-            {/* Avaliação de Técnicas Individuais */}
-            <div className="sumula-section">
-              <h3 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 bg-primary rounded-full"></span>
-                Avaliação de Técnicas
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Selecione o grupo de técnicas e adicione as técnicas avaliadas com suas respectivas notas.
-              </p>
-              <TechniqueScoring scores={techniqueScores} onChange={setTechniqueScores} />
             </div>
 
             {/* Resultado Final */}
@@ -476,12 +516,6 @@ export default function NewEvaluation() {
                     <span className="text-sm text-muted-foreground">Média Prática</span>
                     <p className="text-xl font-bold">{notaPratica.toFixed(2)}</p>
                   </div>
-                  {hasTechniqueScores && (
-                    <div className="p-3 bg-secondary rounded-lg text-center">
-                      <span className="text-sm text-muted-foreground">Média Técnicas</span>
-                      <p className="text-xl font-bold">{techniqueAverage.toFixed(2)}</p>
-                    </div>
-                  )}
                 </div>
                 <div className="p-4 bg-primary text-primary-foreground rounded-lg">
                   <div className="flex items-center justify-between">
