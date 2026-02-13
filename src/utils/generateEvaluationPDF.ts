@@ -2,6 +2,12 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { getLogoBase64 } from './pdfLogoHelper';
 
+interface TechniqueScoreData {
+  category: string;
+  technique: string;
+  score: string;
+}
+
 interface EvaluationPDFData {
   candidateName: string;
   targetGrade: string;
@@ -16,6 +22,7 @@ interface EvaluationPDFData {
   notaPratica: number;
   notaFinal: number;
   status?: 'aprovado' | 'reprovado' | 'pendente';
+  techniqueScores?: TechniqueScoreData[];
 }
 
 export async function generateEvaluationPDF(data: EvaluationPDFData) {
@@ -146,7 +153,81 @@ export async function generateEvaluationPDF(data: EvaluationPDFData) {
   doc.text(data.notaPratica.toFixed(2), pageWidth - 30, currentY + 7, { align: 'right' });
   
   currentY += 18;
-  
+
+  // Technique Scores Table
+  if (data.techniqueScores && data.techniqueScores.length > 0) {
+    // Check if we need a new page
+    if (currentY > 220) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(26, 26, 26);
+    doc.text('AVALIAÇÃO DE TÉCNICAS', 14, currentY);
+    doc.setTextColor(0, 0, 0);
+
+    // Group by category
+    const grouped: Record<string, TechniqueScoreData[]> = {};
+    data.techniqueScores.forEach(t => {
+      if (!grouped[t.category]) grouped[t.category] = [];
+      grouped[t.category].push(t);
+    });
+
+    const techniqueTableData: string[][] = [];
+    Object.entries(grouped).forEach(([category, techs]) => {
+      techs.forEach((t, i) => {
+        techniqueTableData.push([
+          i === 0 ? category : '',
+          t.technique,
+          t.score || '-',
+        ]);
+      });
+    });
+
+    autoTable(doc, {
+      startY: currentY + 4,
+      head: [['Grupo', 'Técnica', 'Nota']],
+      body: techniqueTableData,
+      theme: 'striped',
+      headStyles: {
+        fillColor: [26, 26, 26],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+      },
+      columnStyles: {
+        0: { cellWidth: 45, fontStyle: 'bold' },
+        1: { cellWidth: 85 },
+        2: { cellWidth: 25, halign: 'center' },
+      },
+      margin: { left: 14, right: 14 },
+    });
+
+    // @ts-ignore
+    currentY = doc.lastAutoTable.finalY + 4;
+
+    // Technique Average
+    const validTechScores = data.techniqueScores.filter(t => t.score && !isNaN(parseFloat(t.score)));
+    const techAvg = validTechScores.length > 0
+      ? validTechScores.reduce((sum, t) => sum + parseFloat(t.score), 0) / validTechScores.length
+      : 0;
+
+    doc.setFillColor(240, 240, 240);
+    doc.rect(14, currentY, pageWidth - 28, 10, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.text('Média das Técnicas:', 18, currentY + 7);
+    doc.text(techAvg.toFixed(2), pageWidth - 30, currentY + 7, { align: 'right' });
+
+    currentY += 18;
+  }
+
+  // Check if we need a new page for final result
+  if (currentY > 240) {
+    doc.addPage();
+    currentY = 20;
+  }
+
   // Final Result
   const isApproved = data.status === 'aprovado' || data.notaFinal >= 7;
   const statusColor = isApproved ? [22, 163, 74] : [185, 28, 28];

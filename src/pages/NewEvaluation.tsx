@@ -177,7 +177,19 @@ export default function NewEvaluation() {
   const gradeFields = getFieldsByGrade(selectedGrade);
   const notaTeorica = calculateAverage(gradeFields.teoria);
   const notaPratica = calculateAverage(gradeFields.pratica);
-  const notaFinal = (notaTeorica + notaPratica) / 2;
+
+  // Média das técnicas individuais
+  const techniqueAverage = (() => {
+    const valid = techniqueScores.filter(s => s.score !== '' && !isNaN(parseFloat(s.score)));
+    if (valid.length === 0) return 0;
+    return valid.reduce((sum, s) => sum + parseFloat(s.score), 0) / valid.length;
+  })();
+
+  const hasTechniqueScores = techniqueScores.some(s => s.score !== '');
+  // Se há técnicas avaliadas, média ponderada: (teórica + prática + técnicas) / 3
+  const notaFinal = hasTechniqueScores
+    ? (notaTeorica + notaPratica + techniqueAverage) / 3
+    : (notaTeorica + notaPratica) / 2;
 
   const handleGeneratePDF = () => {
     const candidateName = candidates.find(c => c.id === selectedCandidate)?.full_name || 'Candidato';
@@ -205,6 +217,7 @@ export default function NewEvaluation() {
       notaTeorica,
       notaPratica,
       notaFinal,
+      techniqueScores: techniqueScores.filter(s => s.score !== ''),
     });
 
     toast({
@@ -453,10 +466,28 @@ export default function NewEvaluation() {
             {/* Resultado Final */}
             <div className="sumula-section">
               <h3 className="font-display font-semibold text-lg mb-4">Resultado</h3>
-              <div className="p-4 bg-primary text-primary-foreground rounded-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-medium">Nota Final:</span>
-                  <span className="text-3xl font-bold">{notaFinal.toFixed(2)}</span>
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-3 bg-secondary rounded-lg text-center">
+                    <span className="text-sm text-muted-foreground">Média Teórica</span>
+                    <p className="text-xl font-bold">{notaTeorica.toFixed(2)}</p>
+                  </div>
+                  <div className="p-3 bg-secondary rounded-lg text-center">
+                    <span className="text-sm text-muted-foreground">Média Prática</span>
+                    <p className="text-xl font-bold">{notaPratica.toFixed(2)}</p>
+                  </div>
+                  {hasTechniqueScores && (
+                    <div className="p-3 bg-secondary rounded-lg text-center">
+                      <span className="text-sm text-muted-foreground">Média Técnicas</span>
+                      <p className="text-xl font-bold">{techniqueAverage.toFixed(2)}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 bg-primary text-primary-foreground rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-medium">Nota Final:</span>
+                    <span className="text-3xl font-bold">{notaFinal.toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
             </div>
